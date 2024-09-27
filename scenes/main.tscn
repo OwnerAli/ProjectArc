@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bmujj3rurx1j3"]
+[gd_scene load_steps=14 format=3 uid="uid://bmujj3rurx1j3"]
 
 [ext_resource type="PackedScene" uid="uid://dxojcelrnhad0" path="res://scenes/entities/player.tscn" id="1_7t2wt"]
 
@@ -24,10 +24,53 @@ size = Vector3(60, 2, 60)
 material = SubResource("ShaderMaterial_cdfnv")
 size = Vector3(60, 2, 60)
 
+[sub_resource type="Animation" id="Animation_lns3x"]
+resource_name = "flicker"
+length = 10.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimationPlayer/SpotLight3D:light_energy")
+tracks/0/interp = 0
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(3.5, 4, 4.2, 4.3, 4.6, 7.8, 7.9, 8.2, 8.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 0.0947325),
+"update": 0,
+"values": [1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_kie4t"]
+length = 20.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimationPlayer/SpotLight3D:light_energy")
+tracks/0/interp = 0
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(2.1, 2.3, 2.4, 4, 4.1, 4.4, 4.5, 6.1, 6.3, 6.4, 8.2, 8.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.297299, 0.297299),
+"update": 0,
+"values": [1.0, 0.364, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.364, 1.0, 0.53, 1.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hm4ak"]
+_data = {
+"RESET": SubResource("Animation_kie4t"),
+"flicker": SubResource("Animation_lns3x")
+}
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_kierm"]
 size = Vector3(59, 10, 1)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hiq1x"]
+albedo_color = Color(0.999047, 0.838429, 0.827845, 1)
+
 [sub_resource type="BoxMesh" id="BoxMesh_s1j1f"]
+material = SubResource("StandardMaterial3D_hiq1x")
 size = Vector3(60, 10, 1)
 
 [node name="Main" type="Node3D"]
@@ -38,6 +81,45 @@ environment = SubResource("Environment_eekmq")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866025, -0.433013, 0.25, 0.128254, 0.290889, 0.948121, -0.483271, 0.853161, -0.196382, -4.74858, 19.7833, 22.8942)
 shadow_enabled = true
+
+[node name="Roof" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.4002, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Roof"]
+shape = SubResource("BoxShape3D_p7qmc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Roof"]
+mesh = SubResource("BoxMesh_2iff6")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Roof"]
+libraries = {
+"": SubResource("AnimationLibrary_hm4ak")
+}
+autoplay = "flicker"
+
+[node name="SpotLight3D" type="SpotLight3D" parent="Roof/AnimationPlayer"]
+transform = Transform3D(-0.997855, 0.0654555, -2.32331e-10, -0.00264169, -0.040272, 0.999185, 0.0654022, 0.997043, 0.0403585, 0, 13.2604, 0)
+light_color = Color(0.788235, 1, 1, 1)
+light_size = 1.0
+light_specular = 0.0
+spot_range = 53.979
+spot_attenuation = 0.707107
+spot_angle_attenuation = 0.659761
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Roof/AnimationPlayer"]
+libraries = {
+"": SubResource("AnimationLibrary_hm4ak")
+}
+autoplay = "RESET"
+
+[node name="SpotLight3D" type="SpotLight3D" parent="Roof/AnimationPlayer/AnimationPlayer"]
+transform = Transform3D(-0.997855, 0.0654555, -2.32331e-10, -0.00264169, -0.040272, 0.999185, 0.0654022, 0.997043, 0.0403585, 0, 13.2604, 0)
+light_color = Color(0.788235, 1, 1, 1)
+light_size = 1.0
+light_specular = 0.0
+spot_range = 53.979
+spot_attenuation = 0.707107
+spot_angle_attenuation = 0.659761
 
 [node name="Ground" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
@@ -93,4 +175,4 @@ mesh = SubResource("BoxMesh_s1j1f")
 skeleton = NodePath("../../Wall3/MeshInstance3D3")
 
 [node name="Player" parent="." instance=ExtResource("1_7t2wt")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.72972, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.74281, 0)
